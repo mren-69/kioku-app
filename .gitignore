@@ -1,2 +1,8 @@
 .superpowers/
 node_modules/
+*.png.tmp
+/add.png
+/cards.png
+/home.png
+/study.png
+/study-flipped.png
