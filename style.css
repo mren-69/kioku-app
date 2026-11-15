@@ -1,0 +1,94 @@
+:root{
+  --bg:#fff6d8; --ink:#2b2b3a; --card:#fff; --sub:#8a86a0;
+  --chip:#ffd6e3; --chipInk:#c2335e; --ok:#17a673; --no:#ee5a6f;
+  --btn:#7c5cff; --btnInk:#fff; --line:3px solid #2b2b3a;
+  --shadow:0 6px 0 #2b2b3a; --r:24px;
+  --font:'M PLUS Rounded 1c','Hiragino Maru Gothic ProN','Hiragino Sans','Noto Sans JP',sans-serif;
+  --kr:'Noto Sans KR','Apple SD Gothic Neo',var(--font);
+}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);overscroll-behavior:none}
+button,input{font-family:inherit;font-size:16px;color:inherit}
+button{cursor:pointer}
+#app{min-height:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+
+/* ヘッダー */
+.top{display:flex;align-items:center;gap:10px;padding:16px 16px 8px}
+.top h1{font-size:22px;font-weight:800;flex:1}
+.back{border:0;background:none;font-size:30px;font-weight:800;line-height:1;padding:4px 8px 4px 0}
+.gname{font-size:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34%}
+.chip-btn{border:var(--line);background:var(--chip);color:var(--chipInk);font-weight:800;padding:8px 14px;border-radius:999px}
+
+/* 向き切り替え(大きめ) */
+.seg{flex:1;display:flex;gap:6px;justify-content:flex-end}
+.seg button{flex:1;max-width:96px;min-height:46px;border:var(--line);border-radius:14px;background:var(--card);
+  font-weight:800;font-size:15px;box-shadow:0 3px 0 #2b2b3a}
+.seg button.on{background:var(--btn);color:var(--btnInk)}
+
+/* 一覧 */
+.list{flex:1;padding:8px 16px 16px;display:flex;flex-direction:column;gap:14px}
+.g{background:var(--card);border:var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+.g-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.g .n{font-size:20px;font-weight:800}
+.g .s{font-size:13px;color:var(--sub);margin-top:4px}
+.ghost{border:var(--line);background:var(--bg);border-radius:12px;padding:8px 12px;font-weight:700;font-size:14px}
+.dirs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.dir{border:var(--line);border-radius:16px;background:var(--btn);color:var(--btnInk);font-weight:800;font-size:17px;
+  min-height:60px;padding:6px 4px;box-shadow:0 4px 0 #2b2b3a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.dir small{font-size:11px;font-weight:700;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.dir:active,.seg button:active,.big:active{transform:translateY(3px);box-shadow:0 1px 0 #2b2b3a}
+.add{border:3px dashed var(--sub);background:none;border-radius:var(--r);padding:16px;color:var(--sub);font-weight:800}
+.empty{text-align:center;color:var(--sub);padding:28px 8px;line-height:1.8}
+
+/* フォーム */
+.form{background:var(--card);border:var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:10px}
+.form label{font-size:13px;font-weight:800;color:var(--sub)}
+.form input{width:100%;border:var(--line);border-radius:14px;padding:12px;background:#fffdf5;font-size:18px}
+.form input.kr{font-family:var(--kr)}
+.err{color:var(--no);font-size:14px;font-weight:700;min-height:1em}
+.big{border:var(--line);border-radius:999px;background:var(--btn);color:var(--btnInk);font-weight:800;padding:14px;box-shadow:0 4px 0 #2b2b3a;font-size:17px}
+.big.sub{background:var(--card);color:var(--ink)}
+.big.danger{background:var(--card);color:var(--no)}
+.btns{display:flex;gap:10px}.btns>*{flex:1}
+
+/* カード一覧 */
+.row{background:var(--card);border:var(--line);border-radius:18px;padding:12px 12px 12px 16px;display:flex;align-items:center;gap:8px}
+.row .txt{flex:1;min-width:0}
+.row .txt b{display:block;font-size:18px;font-family:var(--kr);overflow-wrap:anywhere}
+.row .txt span{font-size:14px;color:var(--sub);overflow-wrap:anywhere}
+.ops{display:flex;gap:6px}
+.ops button{border:2px solid #2b2b3a;background:var(--bg);border-radius:10px;padding:6px 8px;font-size:13px;font-weight:700}
+.count{font-size:13px;color:var(--sub);font-weight:700;padding:0 4px}
+
+/* 復習 */
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 20px;gap:14px;overflow:hidden}
+.divider{background:var(--chip);color:var(--chipInk);border:2px solid #2b2b3a;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:800}
+.card{width:100%;height:min(56vh,380px);position:relative;perspective:1000px;touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:transform .25s ease;--ok-o:0;--ng-o:0}
+.inner{position:absolute;inset:0;transition:transform .45s;transform-style:preserve-3d}
+.card.flip .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border:var(--line);
+  border-radius:32px;box-shadow:0 8px 0 #2b2b3a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center}
+.face.b{transform:rotateY(180deg);background:#f4f0ff}
+.lab{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--sub)}
+.word{font-weight:800;font-family:var(--kr);overflow-wrap:anywhere;line-height:1.3}
+.word.xl{font-size:48px}.word.l{font-size:34px}.word.m{font-size:24px}
+.tap{font-size:12px;color:var(--sub)}
+.stamp{position:absolute;top:22px;padding:6px 14px;border-radius:12px;font-weight:800;font-size:20px;border:3px solid;background:#fff;pointer-events:none;z-index:2}
+.stamp.ok{left:20px;color:var(--ok);opacity:var(--ok-o);transform:rotate(-10deg)}
+.stamp.ng{right:20px;color:var(--no);opacity:var(--ng-o);transform:rotate(10deg)}
+.hint{display:flex;justify-content:space-between;width:100%;font-size:14px;font-weight:800}
+.hint .l{color:var(--no)}.hint .r{color:var(--ok)}
+.done{text-align:center;line-height:1.9}
+.done .em{font-size:44px}
+.done b{font-size:22px}
+
+.bottom{display:flex;gap:10px;padding:10px 16px 18px}
+.bottom button{flex:1;border:var(--line);border-radius:999px;background:var(--btn);color:var(--btnInk);font-weight:800;padding:14px;box-shadow:0 4px 0 #2b2b3a}
+.bottom button.sub{background:var(--card);color:var(--ink)}
+.bottom button:disabled{opacity:.4;box-shadow:none}
+.note{font-size:14px;color:var(--sub);line-height:1.8}
+.msg{font-weight:800;font-size:15px}
+.msg.ok{color:var(--ok)}.msg.ng{color:var(--no)}
