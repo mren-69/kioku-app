@@ -1,5 +1,5 @@
 // オフライン対応: キャッシュから即表示し、通信できるときは裏で最新版に更新する
-const CACHE = 'kioku-v1';
+const CACHE = 'kioku-v2';
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'srs.js', 'session.js', 'db.js',
   'manifest.json', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 

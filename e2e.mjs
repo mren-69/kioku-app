@@ -67,6 +67,22 @@ try {
   assert.equal(await page.locator('.g .s').innerText(), 'カード 3枚');
   await page.screenshot({ path: `${shots}/home.png` });
 
+  // ホームの「追加」から直接カードを足せる(続けて入力できる)
+  await page.locator('.g [data-act=add-card]').click();
+  assert.equal(await page.evaluate(() => document.activeElement.name), 'front');
+  await page.fill('input[name=front]', '물');
+  await page.fill('input[name=back]', '水');
+  await page.getByText('＋ カードを追加').click();
+  await page.locator('#msg', { hasText: '물' }).waitFor({ timeout: 3000 });
+  assert.equal(await page.evaluate(() => document.activeElement.name), 'front');
+  await page.screenshot({ path: `${shots}/add.png` });
+  await page.locator('.back').click();
+  assert.equal(await page.locator('.g .s').innerText(), 'カード 4枚');
+  await page.locator('.g [data-act=cards]').click();
+  await page.locator('.row', { hasText: '물' }).getByText('削除').click(); // 以降の枚数を元に戻す
+  await page.waitForFunction(() => document.querySelectorAll('.row').length === 3);
+  await page.locator('.back').click();
+
   // 復習 表→裏
   await page.locator('.dir[data-mode=fb]').click();
   assert.ok(await page.locator('.bottom [data-act=undo]').isDisabled());

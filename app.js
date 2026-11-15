@@ -27,7 +27,8 @@ function home() {
     const sub = { fb: `${g.frontLabel}→${g.backLabel}`, bf: `${g.backLabel}→${g.frontLabel}`, both: 'まぜて' };
     return `<section class="g">
       <div class="g-head"><div><div class="n">${esc(g.name)}</div><div class="s">カード ${n}枚</div></div>
-        <button class="ghost" data-act="cards" data-id="${g.id}">カード編集</button></div>
+        <div class="g-btns"><button class="ghost add-btn" data-act="add-card" data-id="${g.id}">＋ 追加</button>
+        <button class="ghost" data-act="cards" data-id="${g.id}">カード編集</button></div></div>
       <div class="dirs">${Object.keys(MODES).map(m =>
         `<button class="dir" data-act="study" data-id="${g.id}" data-mode="${m}">${MODES[m]}<small>${esc(sub[m])}</small></button>`).join('')}</div>
     </section>`;
@@ -75,6 +76,21 @@ function cardsView() {
   </main>`;
 }
 
+// カード追加専用の画面(追加したあとも残って、続けて入力できる)
+function addCardView() {
+  const g = group(view.id);
+  return `<header class="top"><button class="back" data-act="home">‹</button><h1>${esc(g.name)}に追加</h1></header>
+  <main class="list">
+    <form class="form" data-form="card">
+      <label>表:${esc(g.frontLabel)}</label><input class="kr" name="front" id="f-front" autocomplete="off">
+      <label>裏:${esc(g.backLabel)}</label><input class="kr" name="back" autocomplete="off">
+      <p class="err" id="err"></p>
+      <button class="big">＋ カードを追加</button>
+    </form>
+    <p class="msg ok" id="msg">${view.last ? `追加しました:${esc(view.last)}(全${cardsOf(g.id).length}枚)` : ''}</p>
+  </main>`;
+}
+
 function studyView() {
   const g = group(view.id);
   const seg = Object.keys(MODES).map(m => `<button class="${m === view.mode ? 'on' : ''}" data-act="mode" data-mode="${m}">${MODES[m]}</button>`).join('');
@@ -116,10 +132,11 @@ function backupView() {
 }
 
 function render() {
-  const screens = { home, groupForm, cards: cardsView, study: studyView, backup: backupView };
-  if ((view.name === 'cards' || view.name === 'study' || view.name === 'groupForm' && view.id) && !group(view.id)) view = { name: 'home' };
+  const screens = { home, groupForm, cards: cardsView, addCard: addCardView, study: studyView, backup: backupView };
+  if ((['cards', 'addCard', 'study'].includes(view.name) || view.name === 'groupForm' && view.id) && !group(view.id)) view = { name: 'home' };
   app.innerHTML = screens[view.name]();
   if (view.name === 'study') bindCard();
+  if (view.name === 'addCard') document.getElementById('f-front').focus();
   window.scrollTo(0, 0);
 }
 
@@ -201,6 +218,7 @@ const actions = {
   'new-group': () => go({ name: 'groupForm' }),
   'edit-group': t => go({ name: 'groupForm', id: t.dataset.id }),
   'cards': t => go({ name: 'cards', id: t.dataset.id }),
+  'add-card': t => go({ name: 'addCard', id: t.dataset.id }),
   'study': t => startStudy(t.dataset.id, t.dataset.mode),
   'mode': t => startStudy(view.id, t.dataset.mode),
   'undo': undo,
@@ -276,7 +294,7 @@ app.addEventListener('submit', async e => {
       : { id: newId(), groupId: view.id, front: r.front, back: r.back, createdAt: Date.now(), fb: null, bf: null };
     await saveCard(c);
     data.cards = old ? data.cards.map(x => (x.id === c.id ? c : x)) : [...data.cards, c];
-    go({ name: 'cards', id: view.id });
+    go(view.name === 'addCard' ? { name: 'addCard', id: view.id, last: c.front } : { name: 'cards', id: view.id });
     document.getElementById('f-front')?.focus();
   }
 });
