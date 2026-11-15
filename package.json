@@ -2,5 +2,10 @@
   "name": "kioku-app",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test" }
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.8"
+  }
 }
