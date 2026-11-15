@@ -27,13 +27,13 @@ function home() {
     const sub = { fb: `${g.frontLabel}→${g.backLabel}`, bf: `${g.backLabel}→${g.frontLabel}`, both: 'まぜて' };
     return `<section class="g">
       <div class="g-head"><div><div class="n">${esc(g.name)}</div><div class="s">カード ${n}枚</div></div>
-        <div class="g-btns"><button class="ghost add-btn" data-act="add-card" data-id="${g.id}">＋ 追加</button>
+        <div class="g-btns"><button class="ghost add-btn" data-act="add-card" data-id="${g.id}">追加</button>
         <button class="ghost" data-act="cards" data-id="${g.id}">カード編集</button></div></div>
       <div class="dirs">${Object.keys(MODES).map(m =>
         `<button class="dir" data-act="study" data-id="${g.id}" data-mode="${m}">${MODES[m]}<small>${esc(sub[m])}</small></button>`).join('')}</div>
     </section>`;
   }).join('');
-  return `<header class="top"><h1>グループ</h1><button class="chip-btn" data-act="new-group">＋ 追加</button></header>
+  return `<header class="top"><h1>グループ</h1><button class="chip-btn" data-act="new-group">＋ グループ</button></header>
   <main class="list">
     ${gs || '<div class="empty">まだグループがありません。<br>「韓国語」などのグループを作って、<br>カードを入れていきましょう。</div>'}
     <button class="add" data-act="new-group">＋ 新しいグループ</button>
