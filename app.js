@@ -281,6 +281,9 @@ app.addEventListener('submit', async e => {
   }
 });
 
+// ブラウザに「このデータは勝手に消さないで」とお願いする(容量不足時の自動削除対策)
+navigator.storage?.persist?.().catch(() => {});
+
 await refresh();
 render();
 

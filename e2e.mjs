@@ -8,6 +8,12 @@ const server = spawn(process.execPath, ['serve.js'], { env: { ...process.env, PO
 await new Promise(r => server.stdout.once('data', r));
 const browser = await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
 const ctx = await browser.newContext({ viewport: { width: 390, height: 780 }, deviceScaleFactor: 2 });
+await ctx.addInitScript(() => {
+  if (navigator.storage?.persist) {
+    const orig = navigator.storage.persist.bind(navigator.storage);
+    navigator.storage.persist = () => { window.__persistAsked = true; return orig(); };
+  }
+});
 const page = await ctx.newPage();
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
@@ -28,6 +34,8 @@ const q = () => page.locator('.face:not(.b) .word').innerText();
 
 try {
   await page.goto(url);
+  // データが勝手に消されないよう、永続保存をお願いしている
+  await page.waitForFunction(() => window.__persistAsked === true, null, { timeout: 3000 });
   await page.getByText('＋ 新しいグループ').click();
   await page.fill('input[name=name]', '韓国語');
   await page.fill('input[name=frontLabel]', '韓国語');
