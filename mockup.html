@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>暗記アプリ mockup 3案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=Zen+Maru+Gothic:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;700;800&family=Shippori+Mincho:wght@500;700&family=IBM+Plex+Sans+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,sans-serif;background:#e9e9ee;color:#222;padding:16px}
+h1{font-size:18px;text-align:center;margin:4px 0 12px}
+.note{text-align:center;font-size:13px;color:#555;margin-bottom:14px}
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.tabs button{border:0;padding:10px 16px;border-radius:999px;background:#fff;font-size:14px;cursor:pointer}
+.tabs button.on{background:#222;color:#fff}
+.spec{max-width:760px;margin:0 auto 16px;font-size:13px;background:#fff;border-radius:12px;padding:12px 16px;line-height:1.7}
+.row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.phone{width:320px;height:620px;border-radius:34px;border:8px solid #111;overflow:hidden;position:relative;background:var(--bg);color:var(--ink);font-family:var(--font);display:flex;flex-direction:column}
+.cap{text-align:center;font-size:12px;color:#666;margin-top:6px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:18px 18px 8px}
+.top b{font-size:15px}
+.chip{font-size:12px;padding:4px 10px;border-radius:999px;background:var(--chip);color:var(--chipInk)}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 20px;position:relative}
+.card{width:100%;height:300px;perspective:900px;cursor:pointer;position:relative}
+.inner{position:absolute;inset:0;transition:transform .5s;transform-style:preserve-3d}
+.card.flip .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:var(--cardBorder)}
+.face.back{transform:rotateY(180deg)}
+.lab{font-size:11px;letter-spacing:.1em;color:var(--sub)}
+.word{font-size:46px;font-weight:700;font-family:var(--wordFont)}
+.mean{font-size:30px;font-weight:700}
+.hint{display:flex;justify-content:space-between;width:100%;margin-top:14px;font-size:13px;font-weight:700}
+.hint .l{color:var(--no)}.hint .r{color:var(--ok)}
+.divider{font-size:11px;color:var(--sub);text-align:center;margin-top:10px}
+.bottom{display:flex;gap:10px;padding:12px 18px 18px}
+.bottom button{flex:1;border:0;padding:12px;border-radius:var(--rb);font-size:14px;font-family:inherit;background:var(--btn);color:var(--btnInk);cursor:pointer}
+.groups{padding:6px 18px;display:flex;flex-direction:column;gap:10px;flex:1;overflow:hidden}
+.g{background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);border:var(--cardBorder)}
+.g .n{font-size:17px;font-weight:700}
+.g .s{font-size:12px;color:var(--sub);margin-top:4px}
+.g .m{display:flex;gap:6px;margin-top:10px}
+.g .m span{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--chipInk)}
+.add{border:2px dashed var(--sub);border-radius:var(--r);padding:12px;text-align:center;color:var(--sub);font-size:14px}
+.hidden{display:none}
+
+/* 案A: 紙の単語帳 */
+.A{--bg:#f6efe2;--ink:#3a2f26;--card:#fffdf7;--sub:#9a8a76;--chip:#eadfc8;--chipInk:#6b5a44;--ok:#4f7d5a;--no:#b5543f;--btn:#eadfc8;--btnInk:#3a2f26;--r:10px;--rb:8px;--shadow:0 6px 16px rgba(90,70,40,.18);--cardBorder:1px solid #e0d3b8;--font:'Noto Serif JP',serif;--wordFont:'Noto Sans KR',sans-serif}
+/* 案B: ナイト */
+.B{--bg:#10151f;--ink:#e8edf6;--card:#1b2332;--sub:#7f8da8;--chip:#243049;--chipInk:#9fc0ff;--ok:#5fd4a0;--no:#ff7a8a;--btn:#243049;--btnInk:#e8edf6;--r:20px;--rb:14px;--shadow:0 10px 30px rgba(0,0,0,.45);--cardBorder:1px solid #2b3750;--font:'IBM Plex Sans JP',sans-serif;--wordFont:'Noto Sans KR',sans-serif}
+/* 案C: ポップ */
+.C{--bg:#fff6d8;--ink:#2b2b3a;--card:#ffffff;--sub:#8a86a0;--chip:#ffd6e3;--chipInk:#c2335e;--ok:#17a673;--no:#ee5a6f;--btn:#7c5cff;--btnInk:#fff;--r:28px;--rb:999px;--shadow:0 8px 0 #2b2b3a;--cardBorder:3px solid #2b2b3a;--font:'M PLUS Rounded 1c',sans-serif;--wordFont:'Noto Sans KR',sans-serif}
+</style>
+</head>
+<body>
+<h1>暗記アプリ デザイン3案</h1>
+<p class="note">上のボタンで案を切り替え。カードをタップすると裏返ります(スワイプの動きはまだ付いていません)。</p>
+<div class="tabs" id="tabs"></div>
+<div class="spec" id="spec"></div>
+<div class="row" id="row"></div>
+
+<script>
+const designs = {
+  A:{name:'A 紙の単語帳',cls:'A',
+     spec:'<b>配色:</b> クリーム地にこげ茶の文字、緑=できた/赤茶=できなかった。<b>フォント:</b> 日本語は明朝(Noto Serif JP)、韓国語はNoto Sans KR。<b>レイアウト:</b> 本物のカードのような角の小さい白いカードと、控えめな影。落ち着いて長く使えるタイプ。'},
+  B:{name:'B ナイト',cls:'B',
+     spec:'<b>配色:</b> 濃紺の背景に明るい文字、ミント=できた/ピンク=できなかった。<b>フォント:</b> IBM Plex Sans JP + Noto Sans KR。<b>レイアウト:</b> 丸みの大きいカードで目に優しい。夜に布団の中でやるのに向く。'},
+  C:{name:'C ポップ',cls:'C',
+     spec:'<b>配色:</b> 黄色の背景に紫のボタン、黒い縁取りとくっきりした影。<b>フォント:</b> M PLUS Rounded 1c(丸ゴシック)+ Noto Sans KR。<b>レイアウト:</b> ゲームのような大きく丸いカードで、スワイプが楽しくなる雰囲気。'}
+};
+const tabs=document.getElementById('tabs'),row=document.getElementById('row'),spec=document.getElementById('spec');
+function study(){return `
+<div class="top"><b>韓国語</b><span class="chip">表→裏</span></div>
+<div class="stage">
+  <div class="card" onclick="this.classList.toggle('flip')">
+    <div class="inner">
+      <div class="face"><span class="lab">韓国語</span><div class="word">사과</div></div>
+      <div class="face back"><span class="lab">日本語</span><div class="mean">りんご</div></div>
+    </div>
+  </div>
+  <div class="hint"><span class="l">← できなかった</span><span class="r">できた →</span></div>
+  <div class="divider">ここから先は急がなくてOK</div>
+</div>
+<div class="bottom"><button>↶ 戻す</button><button>⋯ メニュー</button></div>`}
+function home(){return `
+<div class="top"><b>グループ</b><span class="chip">+ 追加</span></div>
+<div class="groups">
+  <div class="g"><div class="n">韓国語</div><div class="s">カード 128枚</div><div class="m"><span>表→裏</span><span>裏→表</span><span>両方</span></div></div>
+  <div class="g"><div class="n">英語</div><div class="s">カード 54枚</div><div class="m"><span>表→裏</span><span>裏→表</span><span>両方</span></div></div>
+  <div class="g"><div class="n">スペイン語</div><div class="s">カード 12枚</div><div class="m"><span>表→裏</span><span>裏→表</span><span>両方</span></div></div>
+  <div class="add">+ 新しいグループ</div>
+</div>
+<div class="bottom"><button>＋ カード追加</button><button>バックアップ</button></div>`}
+function show(k){
+  const d=designs[k];
+  [...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+  spec.innerHTML=d.spec;
+  row.innerHTML=`<div><div class="phone ${d.cls}">${study()}</div><div class="cap">復習画面</div></div>
+                 <div><div class="phone ${d.cls}">${home()}</div><div class="cap">グループ一覧</div></div>`;
+}
+Object.keys(designs).forEach(k=>{const b=document.createElement('button');b.textContent=designs[k].name;b.dataset.k=k;b.onclick=()=>show(k);tabs.appendChild(b)});
+show('A');
+</script>
+</body>
+</html>
