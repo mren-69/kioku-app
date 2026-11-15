@@ -97,7 +97,21 @@ try {
   const after = await page.evaluate(async () => (await import('./db.js')).loadAll());
   assert.equal(after.cards.length, 3);
 
-  const real = errors.filter(e => !/404|ServiceWorker/.test(e) || process.env.STRICT);
+  // PWA: マニフェストとアイコンが読める
+  const mf = await (await page.request.get(url + 'manifest.json')).json();
+  assert.equal(mf.display, 'standalone');
+  for (const i of mf.icons) assert.equal((await page.request.get(url + i.src)).status(), 200);
+  assert.equal((await page.request.get(url + 'icon-180.png')).status(), 200);
+
+  // オフラインでも開ける(Service Worker)
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.reload();
+  await ctx.setOffline(true);
+  await page.reload();
+  await page.locator('.g .n', { hasText: '韓国語' }).waitFor({ timeout: 5000 });
+  await ctx.setOffline(false);
+
+  const real = errors.filter(e => !/net::ERR_INTERNET_DISCONNECTED|fonts\.g/.test(e));
   assert.deepEqual(real, []);
   console.log('E2E OK');
 } catch (e) {

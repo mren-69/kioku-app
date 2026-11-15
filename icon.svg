@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#fff6d8"/>
+  <g stroke="#2b2b3a" stroke-width="18" stroke-linejoin="round">
+    <rect x="150" y="96" width="250" height="320" rx="44" fill="#ffd6e3" transform="rotate(12 275 256)"/>
+    <rect x="112" y="110" width="250" height="320" rx="44" fill="#7c5cff"/>
+  </g>
+  <text x="237" y="318" text-anchor="middle" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-weight="900" font-size="150" fill="#fff">가</text>
+</svg>
