@@ -98,8 +98,25 @@ try {
   assert.equal(await q(), second);  // 戻すで同じカードに
   await swipe(40);                  // 短い移動は判定しない
   assert.equal(await q(), second);
-  await swipe(-160); await swipe(160);
+  await swipe(-160);                // できなかった(同じ復習の最後にもう一度出る)
+  const third = await q();
+  assert.ok(third !== second && third !== first);
+  await swipe(160);                 // 残りの1枚はできた
+  assert.equal(await q(), second);  // できなかったカードが、同じ復習の中でもう一度出た
+  assert.equal(await page.locator('.okdate').count(), 0); // できなかった→「できた日」は消えている
+  await swipe(160);
   await page.getByText('おつかれさま!').waitFor();
+
+  // できた日が、カードの表面の「タップでめくる」の下に薄く出る
+  await page.locator('.seg [data-mode=fb]').click();
+  assert.equal(await page.locator('.okdate').innerText(), '前回できた 今日');
+  const pos = await page.evaluate(() => {
+    const t = document.querySelector('.face:not(.b) .tap').getBoundingClientRect();
+    const d = document.querySelector('.okdate').getBoundingClientRect();
+    return d.top >= t.bottom - 1;
+  });
+  assert.ok(pos);
+  await page.screenshot({ path: `${shots}/okdate.png` });
 
   // 両方モードは6枚分
   await page.locator('.seg [data-mode=both]').click();

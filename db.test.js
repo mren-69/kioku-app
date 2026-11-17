@@ -9,6 +9,13 @@ test('正しいバックアップは通る', () => {
   assert.equal(validateBackup({ groups: [g], cards: [c] }), null);
 });
 
+test('できた日(okAt)は、あってもなくてもよく、あるなら数値かnull', () => {
+  assert.equal(validateBackup({ groups: [g], cards: [{ ...c, okAt: { fb: 1, bf: null } }] }), null);
+  assert.equal(validateBackup({ groups: [g], cards: [{ ...c, okAt: {} }] }), null);
+  assert.ok(validateBackup({ groups: [g], cards: [{ ...c, okAt: { fb: 'きのう' } }] }));
+  assert.ok(validateBackup({ groups: [g], cards: [{ ...c, okAt: 5 }] }));
+});
+
 test('壊れた形は理由つきで拒否', () => {
   assert.ok(validateBackup(null));
   assert.ok(validateBackup({ groups: [] }));

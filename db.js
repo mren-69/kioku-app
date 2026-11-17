@@ -78,6 +78,9 @@ const isStr = x => typeof x === 'string';
 const isNum = x => typeof x === 'number' && Number.isFinite(x);
 const okState = s => s === null || (s && isNum(s.S) && s.S > 0 && isNum(s.last));
 
+// 最後にできた日: { fb?: number|null, bf?: number|null }(古いバックアップには無い)
+const okDates = o => !!o && typeof o === 'object' && ['fb', 'bf'].every(k => o[k] == null || isNum(o[k]));
+
 // 問題なければ null、問題があれば理由(日本語)を返す
 export function validateBackup(data) {
   if (!data || !Array.isArray(data.groups) || !Array.isArray(data.cards)) return 'バックアップの形式ではありません';
@@ -90,6 +93,7 @@ export function validateBackup(data) {
     if (!c || !isStr(c.id) || !isStr(c.front) || !isStr(c.back) || !isNum(c.createdAt)) return 'カードの情報が壊れています';
     if (!ids.has(c.groupId)) return 'どのグループにも属さないカードがあります';
     if (!okState(c.fb) || !okState(c.bf)) return 'カードの学習記録が壊れています';
+    if (c.okAt !== undefined && !okDates(c.okAt)) return 'カードの「できた日」の記録が壊れています';
   }
   return null;
 }

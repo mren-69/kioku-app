@@ -41,18 +41,29 @@ test('R=0.95でできた: 伸びは半分(×1.6)', () => {
   close(review({ S, last: now - t }, true, now).S, S * 1.6);
 });
 
-test('できなかった: ×0.4、下限0.25', () => {
-  close(review({ S: 4, last: now }, false, now).S, 1.6);
-  assert.equal(review({ S: 0.3, last: now }, false, now).S, 0.25);
+test('できなかった: 学習記録を消して未学習(null)に戻す', () => {
+  assert.equal(review({ S: 4, last: now }, false, now), null);
+  assert.equal(review(null, false, now), null);
 });
 
-test('buildQueue: R昇順、bothは2エントリ、同値はcreatedAt順', () => {
+test('buildQueue: R昇順、bothは2エントリ、同値(未学習)は乱数順', () => {
   const a = card('a', { S: 1, last: now - 5 * DAY }, { S: 100, last: now }, 1); // fb低, bf高
   const b = card('b', null, null, 0); // 0.8,0.8
-  const q = buildQueue([a, b], 'both', now);
+  const up = (() => { let i = 0; return () => ++i / 10; })();
+  const q = buildQueue([a, b], 'both', now, up);
   assert.equal(q.length, 4);
   assert.deepEqual(q.map(e => e.card.id + e.course), ['afb', 'bfb', 'bbf', 'abf']);
   for (let i = 1; i < q.length; i++) assert.ok(q[i - 1].R <= q[i].R);
+  const down = (() => { let i = 10; return () => --i / 10; })();
+  const q2 = buildQueue([a, b], 'both', now, down);
+  assert.deepEqual(q2.map(e => e.card.id + e.course), ['afb', 'bbf', 'bfb', 'abf']);
+});
+
+test('buildQueue: 未学習は追加順ではなくランダムに並ぶ', () => {
+  const cs = ['a', 'b', 'c', 'd'].map((id, i) => card(id, null, null, i));
+  const orders = new Set();
+  for (let k = 0; k < 40; k++) orders.add(buildQueue(cs, 'fb', now).map(e => e.card.id).join(''));
+  assert.ok(orders.size > 1);
 });
 
 test('buildQueue: mode fbはfbのみ、bfはbfのみ', () => {

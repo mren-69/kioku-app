@@ -1,5 +1,5 @@
 import { buildQueue, swapCard } from './srs.js';
-import { createSession, classifyGesture, checkCardText, SWIPE_PX } from './session.js';
+import { createSession, classifyGesture, checkCardText, formatOkDate, SWIPE_PX } from './session.js';
 import { loadAll, saveGroup, saveCard, deleteGroup, deleteCard, exportJson, importJson, newId } from './db.js';
 
 const app = document.getElementById('app');
@@ -105,11 +105,12 @@ function studyView() {
     const [qText, aText, qLab, aLab] = e.course === 'fb'
       ? [e.card.front, e.card.back, g.frontLabel, g.backLabel]
       : [e.card.back, e.card.front, g.backLabel, g.frontLabel];
+    const okLabel = formatOkDate(e.card.okAt?.[e.course], Date.now());
     body = `${session.atDivider() ? '<div class="divider">ここから先は急がなくてOK</div>' : ''}
     <div class="card" id="card">
       <div class="stamp ok">できた</div><div class="stamp ng">まだ</div>
       <div class="inner">
-        <div class="face"><span class="lab">${esc(qLab)}</span><div class="word ${sizeClass(qText)}">${esc(qText)}</div><span class="tap">タップでめくる</span></div>
+        <div class="face"><span class="lab">${esc(qLab)}</span><div class="word ${sizeClass(qText)}">${esc(qText)}</div><span class="tap">タップでめくる</span>${okLabel ? `<span class="okdate">${esc(okLabel)}</span>` : ''}</div>
         <div class="face b"><span class="lab">${esc(aLab)}</span><div class="word ${sizeClass(aText)}">${esc(aText)}</div><span class="tap">${esc(qText)}</span></div>
       </div>
     </div>
