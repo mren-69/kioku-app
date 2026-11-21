@@ -1,40 +1,51 @@
-// 復習ロジック(副作用なし)。エビングハウス型の忘却曲線 R = exp(-経過日数 / S)
-const DAY = 86400000;
-export const NEW_R = 0.8;      // 未学習カードの並び順用の仮のR
-export const DUE_R = 0.9;      // これを下回ると「復習どき」
-const GROW = 1.2;              // できた時の最大伸び(×2.2)
+// 復習ロジック(副作用なし)
+// 「できた」の回数で次に出せるまでの間隔が決まる: 1時間 → 1日 → 6日 → 30日(以後ずっと30日)
+// 「できなかった」は学習記録を消して「できるかわからない」に戻す
+const HOUR = 3600000, DAY = 24 * HOUR;
+export const INTERVALS = [0, HOUR, DAY, 6 * DAY, 30 * DAY]; // 添字 = 段階(できた回数)
+const MAX_STEP = INTERVALS.length - 1;
 
-const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
-
-export function retrievability(state, now) {
-  if (!state) return NEW_R;
-  const days = Math.max(0, (now - state.last) / DAY);
-  const r = Math.exp(-days / state.S);
-  return Number.isFinite(r) ? clamp(r, 0, 1) : 0;
+// 学習記録 State: { step: 1..4, last: ms } | null(できるかわからない)
+// 以前の版の記録 { S, last } は、記憶の強さSから段階に読み替える
+export function stepOf(state) {
+  if (!state) return 0;
+  if (Number.isInteger(state.step)) return Math.min(MAX_STEP, Math.max(1, state.step));
+  const S = state.S;
+  return S < 3 ? 1 : S < 7 ? 2 : S < 15 ? 3 : 4;
 }
 
-// できた: 記憶の強さを伸ばす / できなかった: 学習記録を消して「未学習(null)」に戻す
+export const dueAt = state => (state ? state.last + INTERVALS[stepOf(state)] : -Infinity);
+export const isDue = (state, now) => now >= dueAt(state);
+
 export function review(state, ok, now) {
   if (!ok) return null;
-  const S = state ? state.S : 1;
-  const R = retrievability(state, now);
-  // 早めに答えたほど伸びは小さい
-  return { S: S * (1 + GROW * clamp((1 - R) / (1 - DUE_R), 0, 1)), last: now };
+  return { step: Math.min(MAX_STEP, stepOf(state) + 1), last: now };
 }
 
-// Rの低い順。同じR(未学習どうしなど)は乱数でばらつかせる
+const coursesOf = mode => (mode === 'both' ? ['fb', 'bf'] : [mode]);
+
+// 今出せるカードだけを、完全にランダムな順番で(フィッシャー–イェーツのシャッフル)
 export function buildQueue(cards, mode, now, rng = Math.random) {
-  const courses = mode === 'both' ? ['fb', 'bf'] : [mode];
   const q = [];
   for (const card of cards)
-    for (const course of courses)
-      q.push({ card, course, R: retrievability(card[course], now), r: rng() });
-  return q.sort((a, b) => a.R - b.R || a.r - b.r).map(({ r, ...e }) => e);
+    for (const course of coursesOf(mode))
+      if (isDue(card[course], now)) q.push({ card, course });
+  for (let i = q.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [q[i], q[j]] = [q[j], q[i]];
+  }
+  return q;
 }
 
-export function splitIndex(queue) {
-  const i = queue.findIndex(e => e.R >= DUE_R);
-  return i === -1 ? queue.length : i;
+// まだ時間がたっていないカードの中で、一番早く出せるようになる時刻(なければ null)
+export function nextDueAt(cards, mode, now) {
+  let best = null;
+  for (const card of cards)
+    for (const course of coursesOf(mode)) {
+      const t = dueAt(card[course]);
+      if (t > now && (best === null || t < best)) best = t;
+    }
+  return best;
 }
 
 export function swapCard(card) {

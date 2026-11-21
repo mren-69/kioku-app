@@ -66,7 +66,7 @@ button{cursor:pointer}
 
 /* 復習 */
 .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 20px;gap:14px;overflow:hidden}
-.divider{background:var(--chip);color:var(--chipInk);border:2px solid #2b2b3a;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:800}
+.next{font-size:14px;font-weight:700;color:var(--chipInk);margin-top:6px}
 .card{width:100%;height:min(56vh,380px);position:relative;perspective:1000px;touch-action:none;user-select:none;-webkit-user-select:none;
   transition:transform .25s ease;--ok-o:0;--ng-o:0}
 .inner{position:absolute;inset:0;transition:transform .45s;transform-style:preserve-3d}

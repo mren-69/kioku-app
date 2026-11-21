@@ -16,6 +16,14 @@ test('できた日(okAt)は、あってもなくてもよく、あるなら数�
   assert.ok(validateBackup({ groups: [g], cards: [{ ...c, okAt: 5 }] }));
 });
 
+test('学習記録は、新しい形(段階)も以前の形(記憶の強さ)も読み込める', () => {
+  assert.equal(validateBackup({ groups: [g], cards: [{ ...c, fb: { step: 3, last: 5 } }] }), null);
+  assert.equal(validateBackup({ groups: [g], cards: [{ ...c, fb: { S: 2.2, last: 5 } }] }), null);
+  assert.ok(validateBackup({ groups: [g], cards: [{ ...c, fb: { step: 0, last: 5 } }] }));
+  assert.ok(validateBackup({ groups: [g], cards: [{ ...c, fb: { step: 2.5, last: 5 } }] }));
+  assert.ok(validateBackup({ groups: [g], cards: [{ ...c, fb: { step: 2 } }] }));
+});
+
 test('壊れた形は理由つきで拒否', () => {
   assert.ok(validateBackup(null));
   assert.ok(validateBackup({ groups: [] }));

@@ -15,6 +15,7 @@ await ctx.addInitScript(() => {
   }
 });
 const page = await ctx.newPage();
+await page.clock.install(); // 時間がたつ動きを確かめるため、時計を進められるようにする
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('console', m => m.type() === 'error' && errors.push(m.text()));
@@ -30,6 +31,8 @@ async function swipe(dx) {
   await page.mouse.up();
   await page.waitForTimeout(400);
 }
+const all3 = ['사과', '학교', '고양이'];
+const third = (a, b) => all3.find(x => x !== a && x !== b);
 const q = () => page.locator('.face:not(.b) .word').innerText();
 
 try {
@@ -98,18 +101,29 @@ try {
   assert.equal(await q(), second);  // 戻すで同じカードに
   await swipe(40);                  // 短い移動は判定しない
   assert.equal(await q(), second);
-  await swipe(-160);                // できなかった(同じ復習の最後にもう一度出る)
-  const third = await q();
-  assert.ok(third !== second && third !== first);
-  await swipe(160);                 // 残りの1枚はできた
-  assert.equal(await q(), second);  // できなかったカードが、同じ復習の中でもう一度出た
-  assert.equal(await page.locator('.okdate').count(), 0); // できなかった→「できた日」は消えている
-  await swipe(160);
+  await swipe(-160);                // できなかった → 残りの中のランダムな位置にもう一度入る
+  const seen = [];
+  while (await page.locator('#card').count()) {
+    const id = await q();
+    if (id === second) assert.equal(await page.locator('.okdate').count(), 0); // できた日は消えている
+    seen.push(id);
+    await swipe(160);
+  }
+  assert.deepEqual([...seen].sort(), [second, third(first, second)].sort());
   await page.getByText('おつかれさま!').waitFor();
+  assert.match(await page.locator('.next').innerText(), /ごろ/); // 次に出せる時刻
 
-  // できた日が、カードの表面の「タップでめくる」の下に薄く出る
+  // 時間がたっていないカードは出さない
   await page.locator('.seg [data-mode=fb]').click();
-  assert.equal(await page.locator('.okdate').innerText(), '前回できた 今日');
+  assert.equal(await page.locator('#card').count(), 0);
+  assert.match(await page.locator('.done').innerText(), /今出せるカードはありません/);
+  await page.screenshot({ path: `${shots}/empty.png` });
+  assert.equal(await page.locator('.divider').count(), 0);
+
+  // 1時間たつと、また出せる。できた日が「タップでめくる」の下に薄く出る
+  await page.clock.fastForward('01:01:00');
+  await page.locator('.seg [data-mode=fb]').click();
+  assert.match(await page.locator('.okdate').innerText(), /^前回できた /);
   const pos = await page.evaluate(() => {
     const t = document.querySelector('.face:not(.b) .tap').getBoundingClientRect();
     const d = document.querySelector('.okdate').getBoundingClientRect();
@@ -118,7 +132,7 @@ try {
   assert.ok(pos);
   await page.screenshot({ path: `${shots}/okdate.png` });
 
-  // 両方モードは6枚分
+  // 両方モード: 表→裏(1時間たった3枚) + 裏→表(未学習3枚) = 6枚
   await page.locator('.seg [data-mode=both]').click();
   assert.ok(await page.locator('.seg [data-mode=both]').evaluate(e => e.classList.contains('on')));
   await page.screenshot({ path: `${shots}/study.png` });

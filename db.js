@@ -76,7 +76,9 @@ export async function exportJson() {
 
 const isStr = x => typeof x === 'string';
 const isNum = x => typeof x === 'number' && Number.isFinite(x);
-const okState = s => s === null || (s && isNum(s.S) && s.S > 0 && isNum(s.last));
+// 学習記録: null / { step: 1..4, last } / 以前の版の { S, last }
+const okState = s => s === null || (!!s && isNum(s.last) &&
+  ((Number.isInteger(s.step) && s.step >= 1 && s.step <= 4) || (s.step === undefined && isNum(s.S) && s.S > 0)));
 
 // 最後にできた日: { fb?: number|null, bf?: number|null }(古いバックアップには無い)
 const okDates = o => !!o && typeof o === 'object' && ['fb', 'bf'].every(k => o[k] == null || isNum(o[k]));

@@ -1,5 +1,5 @@
 // 復習セッション(画面に依存しない部分)
-import { review, splitIndex } from './srs.js';
+import { review } from './srs.js';
 
 export const SWIPE_PX = 80;   // これ以上横に動かすと判定確定
 export const TAP_PX = 10;     // これ未満の動きはタップ(めくり)
@@ -26,13 +26,19 @@ export function formatOkDate(ms, now) {
   return diff <= 0 ? '前回できた 今日' : `前回できた ${a.getMonth() + 1}/${a.getDate()}(${diff}日前)`;
 }
 
-const REPEAT_MIN = 5;  // できなかったカードは、間に5〜10枚はさんでもう一度出す
-const REPEAT_SPAN = 6;
+// 次にカードを出せる時刻の表示: 「今日 15:05ごろ」「明日 9:00ごろ」「11/27 18:30ごろ」
+export function formatNextDue(ms, now) {
+  if (!Number.isFinite(ms)) return '';
+  const a = new Date(ms), b = new Date(now);
+  const day = d => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const diff = Math.round((day(a) - day(b)) / 86400000);
+  const hm = `${a.getHours()}:${String(a.getMinutes()).padStart(2, '0')}ごろ`;
+  return diff <= 0 ? `今日 ${hm}` : diff === 1 ? `明日 ${hm}` : `${a.getMonth() + 1}/${a.getDate()} ${hm}`;
+}
 
 // queue: buildQueue の結果。判定のたびに保存すべき最新のカードを返す。
 export function createSession(queue, rng = Math.random) {
   queue = [...queue];
-  let split = splitIndex(queue);
   const latest = new Map(queue.map(e => [e.card.id, e.card]));
   const history = [];
   let index = 0;
@@ -46,8 +52,6 @@ export function createSession(queue, rng = Math.random) {
     current: entry,
     total: () => queue.length,
     canUndo: () => history.length > 0,
-    // 危ないカードが尽き、余裕のあるカードが始まる位置(両方が存在するときだけ)
-    atDivider: () => split > 0 && split < queue.length && index === split,
     judge(ok, now) {
       const e = entry();
       if (!e) return null;
@@ -59,12 +63,11 @@ export function createSession(queue, rng = Math.random) {
       };
       latest.set(updated.id, updated);
       index++;
-      const h = { id: card.id, course, prev: card[course], prevOk: card.okAt?.[course] ?? null, prevSplit: split, insertedAt: null };
+      const h = { id: card.id, course, prev: card[course], prevOk: card.okAt?.[course] ?? null, insertedAt: null };
       if (!ok) {
-        // 同じ復習の中で、もう一度出す(未学習に戻ったので区切りより前に数える)
-        h.insertedAt = Math.min(queue.length, index + REPEAT_MIN + Math.floor(rng() * REPEAT_SPAN));
-        queue.splice(h.insertedAt, 0, { card, course, R: 0 });
-        if (h.insertedAt <= split) split++;
+        // 「できるかわからない」に戻ったので、残りのカードの中のランダムな位置にもう一度入れる
+        h.insertedAt = index + Math.floor(rng() * (queue.length - index + 1));
+        queue.splice(h.insertedAt, 0, { card, course });
       }
       history.push(h);
       return updated;
@@ -73,7 +76,6 @@ export function createSession(queue, rng = Math.random) {
       const h = history.pop();
       if (!h) return null;
       if (h.insertedAt !== null) queue.splice(h.insertedAt, 1);
-      split = h.prevSplit;
       const cur = latest.get(h.id);
       const restored = { ...cur, [h.course]: h.prev, okAt: { ...cur.okAt, [h.course]: h.prevOk } };
       latest.set(h.id, restored);

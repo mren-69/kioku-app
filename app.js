@@ -1,5 +1,5 @@
-import { buildQueue, swapCard } from './srs.js';
-import { createSession, classifyGesture, checkCardText, formatOkDate, SWIPE_PX } from './session.js';
+import { buildQueue, nextDueAt, swapCard } from './srs.js';
+import { createSession, classifyGesture, checkCardText, formatOkDate, formatNextDue, SWIPE_PX } from './session.js';
 import { loadAll, saveGroup, saveCard, deleteGroup, deleteCard, exportJson, importJson, newId } from './db.js';
 
 const app = document.getElementById('app');
@@ -100,13 +100,17 @@ function studyView() {
     body = `<div class="done"><div class="em">🗂️</div><b>まだカードがありません</b><p class="note">カードを追加すると、ここで復習できます。</p>
       <p><button class="big" data-act="cards" data-id="${g.id}">カードを追加する</button></p></div>`;
   } else if (!e) {
-    body = `<div class="done"><div class="em">🎉</div><b>おつかれさま!</b><p class="note">今出せるカードはぜんぶ回しました。</p></div>`;
+    const next = formatNextDue(nextDueAt(cardsOf(g.id), view.mode, Date.now()), Date.now());
+    const head = session.total()
+      ? '<div class="em">🎉</div><b>おつかれさま!</b><p class="note">今出せるカードはぜんぶ回しました。</p>'
+      : '<div class="em">☕</div><b>今出せるカードはありません</b><p class="note">前に「できた」カードは、時間がたつとまた出てきます。</p>';
+    body = `<div class="done">${head}${next ? `<p class="next">次に出せるのは ${next}</p>` : ''}</div>`;
   } else {
     const [qText, aText, qLab, aLab] = e.course === 'fb'
       ? [e.card.front, e.card.back, g.frontLabel, g.backLabel]
       : [e.card.back, e.card.front, g.backLabel, g.frontLabel];
     const okLabel = formatOkDate(e.card.okAt?.[e.course], Date.now());
-    body = `${session.atDivider() ? '<div class="divider">ここから先は急がなくてOK</div>' : ''}
+    body = `
     <div class="card" id="card">
       <div class="stamp ok">できた</div><div class="stamp ng">まだ</div>
       <div class="inner">
